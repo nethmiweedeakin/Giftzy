@@ -30,6 +30,13 @@ app.use(express.urlencoded({ extended: false }));
 
 connectDB();
 
+app.use('/api/student', (req, res) => {
+  return res.json({
+    name: "Tsz Hin Yee",
+    studentId: "223983938",
+  })
+})
+
 app.use('/', routes);
 
 app.listen(port, () => {
