@@ -28,19 +28,25 @@ Giftzy is a web application built using **Node.js** that provides smart solution
 | Janaki Chaudhary | 224941505  |
 
 ## API Documentation
+
 /api/users
+
 - `GET` : Get all users
 
 /api/users/google
+
 - `GET` : Authenticate user login by Google
 
 /api/users/login
+
 - `POST` : User login
 
 /api/users/forget-password
+
 - `POST` : user forget password
 
 /api/posts/addpost
+
 - `POST` : Upload new Post
 
 ## 🚀 Getting Started
@@ -76,6 +82,7 @@ GOOGLE_CLIENT_SECRET=
 ```
 
 4. To run the project, use this command:
+
 ```
 npm run start
 ```
@@ -84,4 +91,33 @@ npm run start
 
 ```
 http://localhost:3000
+```
+
+or use Docker to run it
+
+### Build and Run the Containers
+
+```bash
+docker-compose up --build
+```
+
+### Open
+
+```
+http://localhost:3000
+```
+
+### /api/student API
+
+```
+http://localhost:3000/api/student
+```
+
+Expected Outcome
+
+```json
+{
+  "name": "Tsz Hin Yee",
+  "studentId": "223983938"
+}
 ```
