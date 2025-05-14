@@ -190,23 +190,26 @@
     </label>
 </div>      
 
-
-<p>Selected buyer value: <span id="buyer-value"></span></p>
+<p id="buyer-message"></p>
 
 <script>
+    // Get the radio buttons and output element
   const radios = document.querySelectorAll('input[name="buyer"]');
-  const output = document.getElementById('buyer-value');
+  const message = document.getElementById('buyer-message');
 
-  function updateBuyerValue() {
-    const value = document.querySelector('input[name="buyer"]:checked')?.value || '';
-    output.textContent = value;
+  function updateBuyerMessage() {
+    const value = document.querySelector('input[name="buyer"]:checked')?.value;
+
+    message.textContent = value === "true"
+      ? "Thank you for partnering with us!"
+      : value === "false"
+        ? "Enjoy your event planning journey!"
+        : "";
   }
 
-  // Update value on load and whenever selection changes
-  updateBuyerValue();
-  radios.forEach(radio => radio.addEventListener('change', updateBuyerValue));
+  updateBuyerMessage();
+  radios.forEach(radio => radio.addEventListener('change', updateBuyerMessage));
 </script>
-
                 <button type="submit" class="btn-primary">📝 Create Account</button>
             </form>
 
@@ -225,6 +228,8 @@
         </div>
     </div>
 
+
+    
     <script src="/js/signup.js"></script>
 
     <%- include('../components/footer') %>

@@ -12,7 +12,7 @@ const User = require('../models/user');
 router.get('/', guestMiddleware, giftController.listGifts);
 router.get('/add', authMiddleware, giftController.showAddForm);
 router.post('/add', authMiddleware, giftController.addGift);
-router.get('/:id', giftController.getGiftDetail);
+router.get('/:id', guestMiddleware, giftController.getGiftDetail);
 
 router.post('/:id/review', authMiddleware, giftController.postReview);
 
