@@ -14,20 +14,22 @@ exports.listGifts = async (req, res) => {
 };
 
 exports.getGiftDetail = async (req, res) => {
-    try {
-        const gift = await Gift.findById(req.params.id);
-        if (!gift) {
-            return res.status(404).send('Gift not found');
-        }
+  try {
+    const gift = await Gift.findById(req.params.id)
+      .populate('reviews.userId', 'name') // Populate only the 'name' field of user
 
-        res.render('giftMarketplace/detail', {
-            gift,
-            user: req.user 
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
+    if (!gift) {
+      return res.status(404).send('Gift not found');
     }
+
+    res.render('giftMarketplace/detail', {
+      gift,
+      user: req.user,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
 };
 
 exports.showAddForm = (req, res) => {
@@ -37,4 +39,44 @@ exports.showAddForm = (req, res) => {
 exports.addGift = async (req, res) => {
   await giftService.createGift(req.body);
   res.redirect('/giftMarketplace');
+};
+
+
+
+exports.postReview = async (req, res) => {
+  try {
+    const giftId = req.params.id;
+    const { rating, comment } = req.body;
+
+    const gift = await Gift.findById(giftId);
+    if (!gift) return res.status(404).send('Gift not found');
+
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).send('Not logged in');
+
+    // Check if user already reviewed
+    const existingReview = gift.reviews.find(
+      (rev) => rev.userId?.toString() === userId.toString()
+    );
+
+    if (existingReview) {
+      // Update review
+      existingReview.rating = rating;
+      existingReview.comment = comment;
+      existingReview.createdAt = new Date();
+    } else {
+      // Add new review
+      gift.reviews.push({
+        userId,
+        rating,
+        comment,
+      });
+    }
+
+    await gift.save();
+    res.redirect(`/gifts/${giftId}`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
 };

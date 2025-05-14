@@ -39,9 +39,9 @@ const generateDescription = (category, name) => {
     case 'Fashion':
       return `Turn heads with the ${name}, a trendy outfit made for both comfort and flair.`;
     case 'Gadgets':
-      return `Upgrade your life with the ${name}, featuring sleek design and the latest tech innovations.`;
+      return `Upgrade your life with the ${name}, featuring sleek design and the latest tech.`;
     case 'Home Decor':
-      return `Elevate your space with the ${name}. A minimalist touch that brings warmth to any room.`;
+      return `Elevate your space with the ${name}. A minimalist touch to any room.`;
     default:
       return faker.commerce.productDescription();
   }
@@ -62,7 +62,13 @@ const seedGifts = async () => {
       price: parseFloat(faker.commerce.price(15, 150)),
       imageUrl: `https://placehold.co/300x200?text=${encodeURIComponent(category)}&font=roboto`,
       createdAt: faker.date.past(),
-      Availability: faker.datatype.number({ min: 5, max: 100 }),
+      availability: faker.datatype.number({ min: 5, max: 100 }),
+      category,
+      inCartUsers: [],
+      rating: faker.datatype.number({ min: 0, max: 5 }),
+      sellerID: '123',  
+      sellerName: 'user', 
+      sellerEmail: 'user@gmail.com'
     };
   });
 

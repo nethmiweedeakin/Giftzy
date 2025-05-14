@@ -24,28 +24,104 @@
 
         <p class="gift-availability">
           <strong>Availability:</strong>
-          <% if (Number(gift.Availability) > 0) { %>
-            <span class="available"><%= gift.Availability %> in stock</span>
+          <% if (Number(gift.availability) > 0) { %>
+            <span class="available"><%= gift.availability %> in stock</span>
           <% } else { %>
             <span class="unavailable">Out of Stock</span>
           <% } %>
         </p>
 
         <p class="gift-seller"><strong>Seller:</strong> <%= gift.sellerName || "Unknown" %></p>
-
+        <!-- Show Rating as Empty Stars -->
+        <p class="gift-rating">
+            <strong>Rating:</strong>
+            <% for (let i = 0; i < 5; i++) { %>
+                <% if (i < gift.rating) { %>
+                &#9733; <!-- filled star -->
+                <% } else { %>
+                &#9734; <!-- empty star -->
+                <% } %>
+            <% } %>
+            </p>
+        <!-- Quantity Selector -->
+            <div class="quantity-selector">
+            <button type="button" id="decrement">−</button>
+            <input type="number" id="quantity" name="quantity" value="1" min="1" readonly>
+            <button type="button" id="increment">+</button>
+            </div>
         <div class="gift-actions">
-          <form action="/cart/add/<%= gift._id %>" method="POST">
-            <button type="submit" class="add-to-cart-btn" <% if (gift.Availability <= 0) { %> disabled <% } %>>
-              Add to Cart
-            </button>
-          </form>
+         <!-- Add to Cart Form -->
+        <form action="/cart/add/<%= gift._id %>" method="POST" id="cartForm">
+        <input type="hidden" name="quantity" id="quantityInput" value="1">
+        <button type="submit" class="add-to-cart-btn" <% if (gift.availability <= 0) { %> disabled <% } %>>
+            Add to Cart
+        </button>
+        </form>
+                
           <a href="/chat/<%= gift.sellerId %>" class="chat-seller-btn">Chat with Seller</a>
         </div>
 
         <a href="/gifts" class="back-link">← Back to list</a>
       </div>
+      
     </main>
-    <%- include('../components/footer') %>
+
+    <!-- Reviews Section -->
+<main class="review-detail-container">
+<h2>Add a review</h2>
+<ul class="reviews-list">
+  <% gift.reviews.forEach(r => { %>
+    <li>
+      <strong><%= r.userId.name || 'Anonymous' %>:</strong> <%= r.rating %>/5
+      <p><%= r.comment %></p>
+    </li>
+  <% }); %>
+</ul>
+<!-- Add/Edit Review Form -->
+<% let userReview = null; %>
+<% if (user && user.id) { %>
+  <% userReview = gift.reviews.find((rev) => rev.userId.toString() === user.id.toString()); %>
+<% } %>
+
+
+<form action="/gifts/<%= gift._id %>/review" method="POST" class="review-form">
+  <label for="rating">Your Rating:</label>
+  <select name="rating" id="rating" <%= userReview ? 'disabled' : '' %>>
+    <% for (let i = 1; i <= 5; i++) { %>
+      <option value="<%= i %>" <%= userReview && userReview.rating === i ? 'selected' : '' %>><%= i %></option>
+    <% } %>
+  </select>
+
+  <label for="comment">Comment:</label>
+  <textarea name="comment" id="comment" rows="3" <%= userReview ? 'readonly' : '' %>><%= userReview ? userReview.comment : '' %></textarea>
+
+  <% if (!userReview) { %>
+    <button type="submit">Submit Review</button>
+  <% } else { %>
+    <a href="/gifts/<%= gift._id %>/review/edit" class="edit-review-btn">Edit Your Review</a>
+  <% } %>
+</form>
+<section class="review-section">
+  <h2>Reviews</h2>
+
+  <% if (gift.reviews && gift.reviews.length > 0) { %>
+    <% gift.reviews.forEach(review => { %>
+      <div class="review-card">
+        <div class="review-rating">
+          <% for (let i = 0; i < 5; i++) { %>
+            <% if (i < review.rating) { %>
+              &#9733;
+            <% } else { %>
+              &#9734;
+            <% } %>
+          <% } %>
+       
+    <% }) %>
+  <% } else { %>
+    <p class="no-reviews">No reviews yet. Be the first to review this gift!</p>
+  <% } %>
+</section>
+</main>
   </div>
 
   <style>
@@ -73,19 +149,6 @@
       border-radius: 10px;
       color: white;
       text-align: center;
-    }
-
-    .gift-name {
-      font-size: 32px;
-      margin-bottom: 20px;
-    }
-
-    .gift-image {
-      width: 100%;
-      height: 300px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 20px;
     }
 
     .gift-description {
@@ -147,6 +210,120 @@
       text-align: center;
       padding: 10px;
     }
+
+    .gift-rating {
+  font-size: 24px;
+  color: gold;
+  letter-spacing: 2px;
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 15px 0;
+}
+
+.quantity-selector button {
+  padding: 5px 10px;
+  font-size: 20px;
+  background-color: #559A6A;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.quantity-selector input {
+  width: 50px;
+  text-align: center;
+  margin: 0 10px;
+  font-size: 18px;
+}
+
+
+   .review-detail-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 24px;
+  background-color: #2E3847;
+  border-radius: 12px;
+  color: #F5F5F5;
+  text-align: left;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  border: 1px solid #444;
+}
+
+.review-card {
+  background-color: #3C4A59;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid #FFD700;
+}
+
+    .gift-name {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+
+    .gift-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+
+.reviews-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.review-form {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.review-form textarea,
+.review-form select {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  font-size: 16px;
+}
+
+.edit-review-btn {
+  background-color: #FFA500;
+  padding: 8px 16px;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+}
   </style>
 </body>
+<script>
+const availability = "<%= gift.availability %>";
+ // Injecting from server to client
+
+  document.getElementById('increment').addEventListener('click', () => {
+    const input = document.getElementById('quantity');
+    if(parseInt(input.value) < parseInt(availability)) {
+    input.value = parseInt(input.value) + 1;
+     document.getElementById('quantityInput').value = input.value;
+    }
+   
+  });
+
+  document.getElementById('decrement').addEventListener('click', () => {
+    const input = document.getElementById('quantity');
+    if (parseInt(input.value) > 1) {
+      input.value = parseInt(input.value) - 1;
+      document.getElementById('quantityInput').value = input.value;
+    }
+  });
+</script>
+
 </html>

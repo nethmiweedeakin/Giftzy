@@ -1,3 +1,4 @@
+const e = require('express');
 const Gift = require('../models/gift');
 
 exports.getAllGifts = async () => {
@@ -40,3 +41,14 @@ exports.getGiftsByName = async (name) => {
   return await Gift.find({ name: { $regex: name, $options: 'i' } });
 }   
 
+exports.getGiftsBySeller = async (sellerId) => {
+  return await Gift.find({ sellerID: sellerId });
+};
+
+exports.getGiftsByRating = async (rating) => {  
+  return await Gift.find({ rating: { $gte: rating } });
+} 
+
+exports.getGiftsByUser = async () => { Gift.findById(req.params.id)
+  .populate('reviews.userId'); //  access to user's name, email etc.
+}
