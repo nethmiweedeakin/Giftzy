@@ -33,16 +33,32 @@
 
         <p class="gift-seller"><strong>Seller:</strong> <%= gift.sellerName || "Unknown" %></p>
         <!-- Show Rating as Empty Stars -->
+
         <p class="gift-rating">
             <strong>Rating:</strong>
-            <% for (let i = 0; i < 5; i++) { %>
-                <% if (i < gift.rating) { %>
-                &#9733; <!-- filled star -->
-                <% } else { %>
-                &#9734; <!-- empty star -->
-                <% } %>
-            <% } %>
-            </p>
+            <% let totalReview = gift.rating; %> <!-- Start with the initial rating -->
+            <% let reviewCount = gift.reviews.length; %> <!-- Number of reviews -->
+
+            <% gift.reviews.forEach(review => { %>
+                <% totalReview += review.rating; %> <!-- Accumulate the total rating -->
+            <% }); %>
+
+            <% 
+                // Calculate the average rating
+                let averageRating = totalReview / (reviewCount); 
+            %>  
+          <p class="gift-rating">
+    <strong>Rating:</strong>
+    <% for (let i = 0; i < 5; i++) { %>
+        <% if (i < Math.floor(averageRating.toFixed(1))) { %>
+        &#9733;
+        <% } else { %>
+        &#9734;
+        <% } %>
+    <% } %>
+    (<%= averageRating.toFixed(1) %>)
+</p>
+
         <!-- Quantity Selector -->
             <div class="quantity-selector">
             <button type="button" id="decrement">−</button>
@@ -70,12 +86,6 @@
 <main class="review-detail-container">
 <h2>Add a review</h2>
 <ul class="reviews-list">
-  <% gift.reviews.forEach(r => { %>
-    <li>
-      <strong><%= r.userId.name || 'Anonymous' %>:</strong> <%= r.rating %>/5
-      <p><%= r.comment %></p>
-    </li>
-  <% }); %>
 </ul>
 <!-- Add/Edit Review Form -->
 <% let userReview = null; %>
@@ -85,12 +95,20 @@
 
 
 <form action="/gifts/<%= gift._id %>/review" method="POST" class="review-form">
-  <label for="rating">Your Rating:</label>
-  <select name="rating" id="rating" <%= userReview ? 'disabled' : '' %>>
-    <% for (let i = 1; i <= 5; i++) { %>
-      <option value="<%= i %>" <%= userReview && userReview.rating === i ? 'selected' : '' %>><%= i %></option>
-    <% } %>
-  </select>
+  <label for="rating" style="display: inline-block; margin-right: 10px;">Your Rating:</label>
+<select 
+  name="rating" 
+  id="rating" 
+  style="width: 100px; padding: 5px; font-size: 14px; margin-bottom: 10px; display: inline-block;" 
+  <%= userReview ? 'disabled' : '' %>>
+  
+  <% for (let i = 1; i <= 5; i++) { %>
+    <option value="<%= i %>" <%= userReview && userReview.rating === i ? 'selected' : '' %>>
+      <%= i %>
+    </option>
+  <% } %>
+</select>
+
 
   <label for="comment">Comment:</label>
   <textarea name="comment" id="comment" rows="3" <%= userReview ? 'readonly' : '' %>><%= userReview ? userReview.comment : '' %></textarea>
@@ -103,23 +121,28 @@
 </form>
 <section class="review-section">
   <h2>Reviews</h2>
-
-  <% if (gift.reviews && gift.reviews.length > 0) { %>
-    <% gift.reviews.forEach(review => { %>
-      <div class="review-card">
-        <div class="review-rating">
-          <% for (let i = 0; i < 5; i++) { %>
-            <% if (i < review.rating) { %>
-              &#9733;
-            <% } else { %>
-              &#9734;
-            <% } %>
+<% if (gift.reviews && gift.reviews.length > 0) { %>
+  <% gift.reviews.forEach(review => { %>
+    <div class="review-card">
+      <div class="review-rating">
+        <% 
+         for (let i = 0; i < 5; i++) { %>
+          <% if (i < review.rating) { %>
+            &#9733; <!-- filled star -->
+          <% } else { %>
+            &#9734; <!-- empty star -->
           <% } %>
-       
-    <% }) %>
-  <% } else { %>
-    <p class="no-reviews">No reviews yet. Be the first to review this gift!</p>
-  <% } %>
+        <% } %>
+      </div>
+       <strong><%= review.userId.name || 'Anonymous' %>:</strong> <%= review.rating %>/5
+      <div class="review-comment">
+        <p><%= review.comment %></p>
+      </div>
+    </div> <!-- CLOSE .review-card properly -->
+  <% }) %>
+<% } else { %>
+  <p class="no-reviews">No reviews yet. Be the first to review this gift!</p>
+<% } %>
 </section>
 </main>
   </div>

@@ -13,5 +13,4 @@ router.get('/:id', giftController.getGiftDetail);
 
 router.post('/:id/review', authMiddleware, giftController.postReview);
 
-
 module.exports = router;
