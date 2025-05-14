@@ -18,6 +18,7 @@ router.get(
       name: req.user.name,
       email: req.user.email,
       avatar: req.user.avatar,
+    
     });
 
     res.cookie('token', token, {

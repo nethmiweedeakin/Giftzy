@@ -107,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 email: emailForOtp,
                 name: form.name.value.trim(),
                 password: form.password.value,
+                buyer: document.querySelector('input[name="buyer"]:checked')?.value || ''
               }),
             }
           );

@@ -6,6 +6,7 @@ const routes = require('./routes');
 const app = express();
 const port = 3000;
 const passport = require('./middlewares/passport');
+const giftRoutes = require('./routes/giftRoutes');
 
 app.use(express.json());
 
@@ -31,6 +32,9 @@ app.use(express.urlencoded({ extended: false }));
 connectDB();
 
 app.use('/', routes);
+
+
+app.use('/gifts', giftRoutes); // This enables `/gifts`, `/gifts/add`, etc.
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

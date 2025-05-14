@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middlewares/authMiddleware');
 const jwt = require('jsonwebtoken');
-
+const giftService = require('../services/giftService');
 
 
 router.get('/', authMiddleware, (req, res) => {
@@ -48,6 +48,11 @@ router.get('/reset-password/:token', (req, res) => {
 
 router.get('/secret-angel', authMiddleware, (req, res) => {
   res.render('secretAngel/index', { error: null, user: req.user });
+});
+
+router.get('/giftMarketplace', async (req, res) => {
+  const gifts = await giftService.getAllGifts(); // Fetch the gifts
+  res.render('giftMarketplace/index', { gifts, user: req.user }); // Pass 'gifts' and 'user' to the template
 });
 
 module.exports = router;

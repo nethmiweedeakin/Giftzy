@@ -24,6 +24,7 @@ const userController = {
           name: user.name,
           email: user.email,
           avatar: user.avatar,
+          buyer: user.buyer,
         });
 
         res.cookie('token', token, {
@@ -33,6 +34,7 @@ const userController = {
           sameSite: 'lax',
         });
 
+      
         return res.json({ message: 'Login successful' });
       } else {
         res.status(401).json({ message: 'Invalid credentials' });
@@ -43,8 +45,8 @@ const userController = {
   },
   signup: async (req, res) => {
     try {
-      const { name, email, password } = req.body;
-      const newUser = await userService.signup({ name, email, password });
+      const { name, email, password, buyer } = req.body;
+      const newUser = await userService.signup({ name, email, password, buyer });
       res
         .status(201)
         .json({ message: 'User created successfully', user: newUser });
@@ -128,6 +130,7 @@ const userController = {
           id: updatedUser._id,
           name: updatedUser.name,
           avatar: updatedUser.avatar,
+          buyer: updatedUser.buyer,
         },
         process.env.JWT_SECRET,
       );

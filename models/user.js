@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    buyer: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true },
 );

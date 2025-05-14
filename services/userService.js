@@ -36,9 +36,9 @@ const userService = {
     }
   },
 
-  signup: async ({ name, email, password }) => {
+  signup: async ({ name, email, password, buyer }) => {
     try {
-      if (!name || !email || !password) {
+      if (!name || !email || !password ) {
         throw new Error('All fields are required');
       }
 
@@ -48,7 +48,7 @@ const userService = {
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = new User({ name, email, password: hashedPassword });
+      const newUser = new User({ name, email, password: hashedPassword, buyer });
       return await newUser.save();
     } catch (error) {
       throw new Error(error.message);
@@ -63,7 +63,7 @@ const userService = {
       }
 
       const resetToken = jwt.sign(
-        { user: { id: user._id, name: user.name, email: user.email }, tokenType: 'reset' },
+        { user: { id: user._id, name: user.name, email: user.email, buyer:user.buyer }, tokenType: 'reset' },
         process.env.JWT_SECRET || 'secret',
         {
           expiresIn: '1h',
