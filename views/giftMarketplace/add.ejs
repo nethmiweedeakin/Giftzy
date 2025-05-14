@@ -1,60 +1,96 @@
 <style>
-    .form-container {
-      max-width: 500px;
-      margin: 40px auto;
-      padding: 30px;
-      background-color: #f7f7f7;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  .form-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 35px;
+    background: linear-gradient(to right, #f9f9f9, #e0e0e0);
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .form-container h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 28px;
+  }
+
+  .form-container input,
+  .form-container textarea,
+  .form-container select,
+  .form-container button {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-sizing: border-box;
+  }
+
+  .form-container textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .form-container select {
+    background-color: #fff;
+  }
+
+  .form-container button {
+    background-color: #007BFF;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .form-container button:hover {
+    background-color: #0056b3;
+  }
+</style>
+
+<div class="form-container">
+  <h1>Add New Gift</h1>
+  <form method="POST" action="/gifts/add" id="giftForm">
+    <input name="name" placeholder="Gift Name" required />
+
+    <textarea name="description" placeholder="Description (optional)"></textarea>
+
+    <input name="price" type="number" step="0.01" placeholder="Price in $" required />
+
+    <input name="availability" type="number" step="1" placeholder="Stock in inventory" required />
+
+    <select name="category" id="categorySelect" required>
+      <option value="">-- Select Category --</option>
+      <option value="Toys">Toys</option>
+      <option value="Books">Books</option>
+      <option value="Fashion">Fashion</option>
+      <option value="Gadgets">Gadgets</option>
+      <option value="Home Decor">Home Decor</option>
+    </select>
+
+    <input name="imageUrl" id="imageUrl" placeholder="Image URL (optional)" />
+
+    <button type="submit">🎁 Add Gift</button>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById('giftForm');
+  const categorySelect = document.getElementById('categorySelect');
+  const imageUrlInput = document.getElementById('imageUrl');
+
+  form.addEventListener('submit', function (e) {
+    const category = categorySelect.value;
+    const imageUrl = imageUrlInput.value.trim();
+
+    // Set default placeholder image if not provided
+    if (!imageUrl && category) {
+      imageUrlInput.value = `https://placehold.co/300x200?text=${encodeURIComponent(category)}&font=roboto`;
     }
-  
-    .form-container h1 {
-      text-align: center;
-      margin-bottom: 25px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #333;
-    }
-  
-    .form-container input,
-    .form-container textarea,
-    .form-container button {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
-    }
-  
-    .form-container textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-  
-    .form-container button {
-      background-color: #4CAF50;
-      color: white;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-  
-    .form-container button:hover {
-      background-color: #45a049;
-    }
-  </style>
-  
-  <div class="form-container">
-    <h1>Add New Gift</h1>
-    <form method="POST" action="/gifts/add">
-      <input name="name" placeholder="Gift Name" required />
-      <textarea name="description" placeholder="Description (optional)"></textarea>
-      <input name="price" type="number" step="0.01" placeholder="Price in $" required />
-      <input name="Availability" type="number" step="1" placeholder="Stock in inventory" required />
-      <input name="imageUrl" placeholder="Image URL (optional)" />
-      <button type="submit">🎁 Add Gift</button>
-    </form>
-  </div>
-   
+  });
+</script>

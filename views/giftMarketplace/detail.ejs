@@ -32,31 +32,29 @@
         </p>
 
         <p class="gift-seller"><strong>Seller:</strong> <%= gift.sellerName || "Unknown" %></p>
-        <!-- Show Rating as Empty Stars -->
+     <% 
+  let totalReview = gift.rating || 0; // Ensure we start from a safe number
+  let reviewCount = gift.reviews?.length || 0;
 
-        <p class="gift-rating">
-            <strong>Rating:</strong>
-            <% let totalReview = gift.rating; %> <!-- Start with the initial rating -->
-            <% let reviewCount = gift.reviews.length; %> <!-- Number of reviews -->
+  gift.reviews?.forEach(review => {
+    totalReview += review.rating || 0; // Handle undefined or null ratings
+  });
 
-            <% gift.reviews.forEach(review => { %>
-                <% totalReview += review.rating; %> <!-- Accumulate the total rating -->
-            <% }); %>
+  // Protect against division by zero
+  let safeCount = reviewCount > 0 ? reviewCount : 1;
+  let averageRating = reviewCount > 0 ? totalReview / safeCount : 0;
+%>
 
-            <% 
-                // Calculate the average rating
-                let averageRating = totalReview / (reviewCount); 
-            %>  
-          <p class="gift-rating">
-    <strong>Rating:</strong>
-    <% for (let i = 0; i < 5; i++) { %>
-        <% if (i < Math.floor(averageRating.toFixed(1))) { %>
-        &#9733;
-        <% } else { %>
-        &#9734;
-        <% } %>
+<p class="gift-rating">
+  <strong>Rating:</strong>
+  <% for (let i = 0; i < 5; i++) { %>
+    <% if (i < Math.floor(averageRating)) { %>
+      &#9733;
+    <% } else { %>
+      &#9734;
     <% } %>
-    (<%= averageRating.toFixed(1) %>)
+  <% } %>
+  (<%= averageRating.toFixed(1) %>)
 </p>
 
         <!-- Quantity Selector -->
@@ -84,6 +82,7 @@
 
     <!-- Reviews Section -->
 <main class="review-detail-container">
+ <% if (user) { %>
 <h2>Add a review</h2>
 <ul class="reviews-list">
 </ul>
@@ -119,6 +118,7 @@
     <a href="/gifts/<%= gift._id %>/review/edit" class="edit-review-btn">Edit Your Review</a>
   <% } %>
 </form>
+<% } %>
 <section class="review-section">
   <h2>Reviews</h2>
 <% if (gift.reviews && gift.reviews.length > 0) { %>

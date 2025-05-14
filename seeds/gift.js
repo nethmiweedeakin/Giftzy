@@ -65,7 +65,7 @@ const seedGifts = async () => {
       availability: faker.datatype.number({ min: 5, max: 100 }),
       category,
       inCartUsers: [],
-      rating: faker.datatype.number({ min: 0, max: 5 }),
+      rating: 0,
       sellerID: '123',  
       sellerName: 'user', 
       sellerEmail: 'user@gmail.com'
