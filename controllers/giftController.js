@@ -33,15 +33,13 @@ exports.getGiftDetail = async (req, res) => {
 };
 
 exports.showAddForm = (req, res) => {
-  res.render('giftMarketplace/add');
+  res.render('giftMarketplace/add', { user: req.user});
 };
 
 exports.addGift = async (req, res) => {
   await giftService.createGift(req.body);
   res.redirect('/giftMarketplace');
 };
-
-
 
 exports.postReview = async (req, res) => {
   try {

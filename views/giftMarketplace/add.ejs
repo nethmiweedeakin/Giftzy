@@ -54,8 +54,25 @@
 </style>
 
 <div class="form-container">
+  <!-- Display User Information -->
+  <div>
+    <h3>User Info:</h3>
+    <p><strong>Name:</strong> <%= user ? user.name : 'No user logged in' %></p>
+    <p><strong>Email:</strong> <%= user ? user.email : 'No email available' %></p>
+    <p><strong>ID:</strong> <%= user ? user.id : 'No ID available' %></p>
+  </div>
+
+
+
+
   <h1>Add New Gift</h1>
   <form method="POST" action="/gifts/add" id="giftForm">
+
+      <!-- Hidden Inputs for Seller Info (Injected by EJS) -->
+    <input type="hidden" name="sellerName" id="sellerName" value="<%= user ? user.name : '' %>" />
+    <input type="hidden" name="sellerEmail" id="sellerEmail" value="<%= user ? user.email : '' %>" />
+    <input type="hidden" name="sellerID" id="sellerID" value="<%= user ? user.id : '' %>" />
+
     <input name="name" placeholder="Gift Name" required />
 
     <textarea name="description" placeholder="Description (optional)"></textarea>
@@ -92,5 +109,7 @@
     if (!imageUrl && category) {
       imageUrlInput.value = `https://placehold.co/300x200?text=${encodeURIComponent(category)}&font=roboto`;
     }
+
+
   });
 </script>
