@@ -1,6 +1,9 @@
 const giftService = require('../services/giftService.js');
 const Gift = require('../models/gift');
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const Cart = require('../models/cart');
+
 
 exports.listGifts = async (req, res) => {
   const gifts = await giftService.getAllGifts();
@@ -77,6 +80,67 @@ exports.postReview = async (req, res) => {
     console.error(error);
     res.status(500).send('Server error');
   }
+};
+
+//Cart exports
+
+// View Cart
+exports.viewCart = (req, res) => {
+  const cart = req.session.cart || [];
+  res.render('giftMarketplace/cart', { cart,  user: req.user });
+};
+
+// Add to Cart
+exports.addToCart = async (req, res) => {
+  const giftId = req.params.id;
+  const selectedQuantity = parseInt(req.body.quantity) || 1;
+
+  try {
+    const gift = await Gift.findById(giftId);
+
+    if (!gift) {
+      return res.status(404).send('Gift not found');
+    }
+
+    if (!req.session.cart) {
+      req.session.cart = [];
+    }
+
+    const existingItem = req.session.cart.find(item => item.id === giftId);
+
+    if (existingItem) {
+      existingItem.quantity += selectedQuantity;
+    } else {
+      req.session.cart.push({
+        id: gift._id.toString(),
+        name: gift.name,
+        quantity: selectedQuantity
+      });
+    }
+
+    res.redirect('/gifts/cart');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+};
+
+
+// Remove specific item
+exports.removeFromCart = (req, res) => {
+  const itemId = req.params.id;
+
+  if (req.session.cart) {
+    req.session.cart = req.session.cart.filter(item => item.id !== itemId);
+  }
+
+ res.redirect('/gifts/cart')
+};
+
+// Clear entire cart
+exports.clearCart = (req, res) => {
+  req.session.cart = [];
+res.redirect('/gifts/cart')
 };
 
 

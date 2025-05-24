@@ -32,29 +32,31 @@
         </p>
 
         <p class="gift-seller"><strong>Seller:</strong> <%= gift.sellerName || "Unknown" %></p>
-     <% 
-  let totalReview = gift.rating || 0; // Ensure we start from a safe number
-  let reviewCount = gift.reviews?.length || 0;
+        <!-- Show Rating as Empty Stars -->
 
-  gift.reviews?.forEach(review => {
-    totalReview += review.rating || 0; // Handle undefined or null ratings
-  });
+        <p class="gift-rating">
+            <strong>Rating:</strong>
+            <% let totalReview = gift.rating; %> <!-- Start with the initial rating -->
+            <% let reviewCount = gift.reviews.length; %> <!-- Number of reviews -->
 
-  // Protect against division by zero
-  let safeCount = reviewCount > 0 ? reviewCount : 1;
-  let averageRating = reviewCount > 0 ? totalReview / safeCount : 0;
-%>
+            <% gift.reviews.forEach(review => { %>
+                <% totalReview += review.rating; %> <!-- Accumulate the total rating -->
+            <% }); %>
 
-<p class="gift-rating">
-  <strong>Rating:</strong>
-  <% for (let i = 0; i < 5; i++) { %>
-    <% if (i < Math.floor(averageRating)) { %>
-      &#9733;
-    <% } else { %>
-      &#9734;
+            <% 
+                // Calculate the average rating
+                let averageRating = totalReview / (reviewCount); 
+            %>  
+          <p class="gift-rating">
+    <strong>Rating:</strong>
+    <% for (let i = 0; i < 5; i++) { %>
+        <% if (i < Math.floor(averageRating.toFixed(1))) { %>
+        &#9733;
+        <% } else { %>
+        &#9734;
+        <% } %>
     <% } %>
-  <% } %>
-  (<%= averageRating.toFixed(1) %>)
+    (<%= averageRating.toFixed(1) %>)
 </p>
 
         <!-- Quantity Selector -->
@@ -65,9 +67,9 @@
             </div>
         <div class="gift-actions">
          <!-- Add to Cart Form -->
-        <form action="/cart/add/<%= gift._id %>" method="POST" id="cartForm">
-        <input type="hidden" name="quantity" id="quantityInput" value="1">
-        <button type="submit" class="add-to-cart-btn" <% if (gift.availability <= 0) { %> disabled <% } %>>
+    <form action="/gifts/cart/add/<%= gift._id %>" method="POST" id="cartForm">
+        <input type="hidden" name="quantity" id="formQuantity" value="1">
+      <button type="submit" class="add-to-cart-btn" <% if (gift.availability <= 0) { %> disabled <% } %>>
             Add to Cart
         </button>
         </form>
@@ -330,7 +332,16 @@
 <script>
 const availability = "<%= gift.availability %>";
  // Injecting from server to client
+  const form = document.getElementById('cartForm');
+  const quantityInput = document.getElementById('quantity');
+  const formQuantity = document.getElementById('formQuantity');
 
+ form.addEventListener('submit', () => {
+    formQuantity.value = quantityInput.value;
+  });
+
+
+  //Increment and Decrement functionality
   document.getElementById('increment').addEventListener('click', () => {
     const input = document.getElementById('quantity');
     if(parseInt(input.value) < parseInt(availability)) {

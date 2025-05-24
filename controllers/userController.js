@@ -3,6 +3,13 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
 const signJWT = require('../helpers/signJWT');
+const Cart = require('../models/cart');
+const Gift = require('../models/gift');
+const User = require('../models/user');
+const { handleCartOnLogout } = require('../services/giftService'); 
+const { loadCartFromDB } = require('../services/giftService'); 
+
+
 
 const userController = {
   getAllUsers: async (req, res) => {
@@ -34,6 +41,7 @@ const userController = {
           sameSite: 'lax',
         });
 
+        await loadCartFromDB(req, token);
       
         return res.json({ message: 'Login successful' });
       } else {
@@ -141,7 +149,10 @@ const userController = {
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   },
-  logout: (req, res) => {
+  logout: async (req, res) => {
+     
+    await handleCartOnLogout(req);
+
     res.clearCookie('token', {
       httpOnly: true,
       sameSite: 'lax',

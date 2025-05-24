@@ -3,7 +3,7 @@
     max-width: 600px;
     margin: 50px auto;
     padding: 35px;
-    background: linear-gradient(to right, #f9f9f9, #e0e0e0);
+    background: linear-gradient(to right, #f9f9f9, #f5ebe2);
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -36,11 +36,11 @@
   }
 
   .form-container select {
-    background-color: #fff;
+    background-color: #f6e3d6;
   }
 
   .form-container button {
-    background-color: #007BFF;
+    background-color: #d0881b;
     color: white;
     font-weight: bold;
     border: none;
@@ -49,7 +49,7 @@
   }
 
   .form-container button:hover {
-    background-color: #0056b3;
+    background-color: #a74b24;
   }
 </style>
 
@@ -72,6 +72,7 @@
     <input type="hidden" name="sellerName" id="sellerName" value="<%= user ? user.name : '' %>" />
     <input type="hidden" name="sellerEmail" id="sellerEmail" value="<%= user ? user.email : '' %>" />
     <input type="hidden" name="sellerID" id="sellerID" value="<%= user ? user.id : '' %>" />
+      <input type="hidden" name="rating" id="rating" value="0" />
 
     <input name="name" placeholder="Gift Name" required />
 
