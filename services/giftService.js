@@ -77,60 +77,75 @@ exports.loadCartFromDB = async (req, token) => {
   }
 };
 
-
 exports.handleCartOnLogout = async (req) => {
   const sessionCart = req.session.cart;
-console.log('Session cart:', sessionCart);
+  console.log('Session cart:', sessionCart);
 
-// Get userId from JWT cookie
-const token = req.cookies.token;
-let userId = null;
-
-try {
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  userId = decoded.id;
-  console.log('Decoded user ID:', userId);
-} catch (err) {
-  console.error('JWT decode error:', err);
-}
-
-// ✅ Adjusted condition for array-based cart
-if (Array.isArray(sessionCart) && sessionCart.length > 0 && userId) {
-  const formattedItems = sessionCart.map(item => ({
-    giftId: item.id,
-    quantity: item.quantity || 1
-  }));
-
-  const newCart = new Cart({
-    userId,
-    items: formattedItems
-  });
+  // Get userId from JWT cookie
+  const token = req.cookies.token;
+  let userId = null;
 
   try {
-    await newCart.save();
-    console.log('Cart saved to DB');
-  } catch (saveErr) {
-    console.error('Error saving cart:', saveErr);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    userId = decoded.id;
+    console.log('Decoded user ID:', userId);
+  } catch (err) {
+    console.error('JWT decode error:', err);
   }
 
-  for (const item of formattedItems) {
+  if (Array.isArray(sessionCart) && sessionCart.length > 0 && userId) {
+    const formattedItems = sessionCart.map(item => ({
+      giftId: item.id,
+      quantity: item.quantity || 1
+    }));
+
     try {
-      await Gift.findByIdAndUpdate(
-        item.giftId,
-        { $addToSet: { inCartUsers: userId } }
-      );
-    } catch (updateErr) {
-      console.error(`Error updating gift ${item.giftId}:`, updateErr);
+      // Try to find existing cart for this user
+      let existingCart = await Cart.findOne({ userId });
+
+      if (existingCart) {
+        // Merge sessionCart into existing cart
+        for (const sessionItem of formattedItems) {
+          const dbItem = existingCart.items.find(item =>
+            item.giftId.toString() === sessionItem.giftId
+          );
+
+          if (dbItem) {
+            dbItem.quantity += sessionItem.quantity;
+          } else {
+            existingCart.items.push(sessionItem);
+          }
+        }
+
+        await existingCart.save();
+        console.log('Existing cart updated in DB');
+      } else {
+        // No existing cart, create a new one
+        const newCart = new Cart({
+          userId,
+          items: formattedItems
+        });
+
+        await newCart.save();
+        console.log('New cart created and saved to DB');
+      }
+
+      // Add user to inCartUsers on relevant gifts
+      for (const item of formattedItems) {
+        await Gift.findByIdAndUpdate(
+          item.giftId,
+          { $addToSet: { inCartUsers: userId } }
+        );
+      }
+    } catch (err) {
+      console.error('Cart save/update error:', err);
     }
+  } else {
+    console.log('No cart to save or user not authenticated.');
   }
-} else {
-  console.log('No cart to save or user not authenticated.');
-}
 
-req.session.cart = null;
-
+  req.session.cart = null; // Clear session cart
 };
-
 
 
 exports.getGiftsByCategory = async (category) => {
