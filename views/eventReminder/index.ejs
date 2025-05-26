@@ -1,0 +1,103 @@
+
+<%- include('../components/header', { title: 'Event Reminder' , user }) %>
+   <div class="calendar-container">
+        <div class="row">
+            <div id='calendar'></div>
+        </div>
+    </div>
+    <div id="modal1" class="modal modal-fixed-footer">
+        <div class="row modal-content">
+            <form class="col s12">
+                <div class="row">
+                    <h5 class="modal-title" id="modalLabel">Add New Event</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+			    </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input placeholder="Placeholder" id="event_name" type="text" class="validate">
+                        <label for="event_name">Event name</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input id="event_start_date" type="text" class="form-control onlydatepicker">
+                        <label for="event_start_date">Event start date</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input id="event_end_date" type="text" class="form-control onlydatepicker">
+                        <label for="event_end_date">Event end date</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12 center-align">
+                        <a class="waves-effect waves-light btn" id="formSubmit" onclick="save_event()">Save</a>
+                        <button type="submit">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<%- include('../components/footer') %>
+
+<script>
+       document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            navLinks: true, // can click day/week names to navigate views
+            selectable: true,
+            select: function(info) {
+				let event_name = prompt("Enter event name: ");
+                if (event_name) {
+                    calendar.addEvent({
+                        title: event_name,
+                        start: info.start,
+                        end: info.end
+                    })
+                }
+			},
+            eventClick: function(info) {
+                if (confirm('Delete this event?')) {
+                    info.event.remove();
+                }
+            },
+            //events: events,
+            editable: true,
+            dayMaxEvents: true, // allow "more" link when too many events
+            });
+        calendar.render();
+    });
+</script>
+
+<style>
+    :root {
+        --fc-small-font-size: .85em;
+        --fc-page-bg-color: #f19393;
+        --fc-neutral-bg-color: rgba(148, 53, 53, 0.3);
+        --fc-neutral-text-color: #951515;
+        --fc-border-color: var(--main-color);
+
+        --fc-button-text-color: #fff;
+        --fc-button-bg-color: var(--main-color);
+        --fc-button-border-color: #2C3E50;
+        --fc-button-hover-bg-color: #1e2b37;
+        --fc-button-hover-border-color: #1a252f;
+        --fc-button-active-bg-color: #1a252f;
+        --fc-button-active-border-color: #151e27;
+    }
+
+    .calendar-container {
+        background-color: var(--secondary-color);
+        text-align: center;
+        height: 100%;
+        overflow: auto;
+        padding: 5%;
+    }
+
+
+    .title {
+        font-size: 36px;
+    }
+</style>
+
