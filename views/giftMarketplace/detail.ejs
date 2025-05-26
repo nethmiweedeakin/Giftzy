@@ -15,7 +15,7 @@
       <% if (gift.imageUrl) { %>
         <img src="<%= gift.imageUrl %>" alt="<%= gift.name %>" class="gift-image">
       <% } else { %>
-        <img src="/images/default.jpg" alt="No image available" class="gift-image">
+        <img src="/images/default.jpg" alt="Not available" class="gift-image">
       <% } %>
 
       <div class="gift-info">
@@ -45,7 +45,7 @@
 
             <% 
                 // Calculate the average rating
-                let averageRating = totalReview / (reviewCount); 
+               let averageRating = reviewCount > 0 ? totalReview / reviewCount : 0;
             %>  
           <p class="gift-rating">
     <strong>Rating:</strong>

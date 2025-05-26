@@ -6,8 +6,8 @@ const signJWT = require('../helpers/signJWT');
 const Cart = require('../models/cart');
 const Gift = require('../models/gift');
 const User = require('../models/user');
-const { handleCartOnLogout } = require('../services/giftService'); 
-const { loadCartFromDB } = require('../services/giftService'); 
+const { handleCartOnLogout } = require('../services/cartService'); 
+const { loadCartFromDB } = require('../services/cartService'); 
 
 
 

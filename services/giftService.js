@@ -29,125 +29,6 @@ exports.deleteGift = async (id) => {
   return await Gift.findByIdAndDelete(id);
 };
 
-exports.loadCartFromDB = async (req, token) => {
-  let userId = null;
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    userId = decoded.id;
-    console.log('Decoded user ID:', userId);
-  } catch (err) {
-    console.error('JWT decode error during login cart load:', err);
-    return;
-  }
-
-  if (!userId) return;
-
-  try {
-    const existingCart = await Cart.findOne({ userId });
-
-    if (existingCart && existingCart.items.length > 0) {
-      const sessionCart = [];
-
-      for (const item of existingCart.items) {
-        const gift = await Gift.findById(item.giftId);
-
-        if (gift) {
-          sessionCart.push({
-            id: gift._id,
-            name: gift.name,
-            quantity: item.quantity
-          });
-        } else {
-          // Fallback if gift is deleted or missing
-          sessionCart.push({
-            id: item.giftId,
-            name: '(Gift not found)',
-            quantity: item.quantity
-          });
-        }
-      }
-
-      req.session.cart = sessionCart;
-      console.log('Cart loaded from DB into session:', req.session.cart);
-    } else {
-      console.log('No cart found for user or cart is empty.');
-    }
-  } catch (dbErr) {
-    console.error('Error loading cart from DB:', dbErr);
-  }
-};
-
-exports.handleCartOnLogout = async (req) => {
-  const sessionCart = req.session.cart;
-  console.log('Session cart:', sessionCart);
-
-  // Get userId from JWT cookie
-  const token = req.cookies.token;
-  let userId = null;
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    userId = decoded.id;
-    console.log('Decoded user ID:', userId);
-  } catch (err) {
-    console.error('JWT decode error:', err);
-  }
-
-  if (Array.isArray(sessionCart) && sessionCart.length > 0 && userId) {
-    const formattedItems = sessionCart.map(item => ({
-      giftId: item.id,
-      quantity: item.quantity || 1
-    }));
-
-    try {
-      // Try to find existing cart for this user
-      let existingCart = await Cart.findOne({ userId });
-
-      if (existingCart) {
-        // Merge sessionCart into existing cart
-        for (const sessionItem of formattedItems) {
-          const dbItem = existingCart.items.find(item =>
-            item.giftId.toString() === sessionItem.giftId
-          );
-
-          if (dbItem) {
-            dbItem.quantity += sessionItem.quantity;
-          } else {
-            existingCart.items.push(sessionItem);
-          }
-        }
-
-        await existingCart.save();
-        console.log('Existing cart updated in DB');
-      } else {
-        // No existing cart, create a new one
-        const newCart = new Cart({
-          userId,
-          items: formattedItems
-        });
-
-        await newCart.save();
-        console.log('New cart created and saved to DB');
-      }
-
-      // Add user to inCartUsers on relevant gifts
-      for (const item of formattedItems) {
-        await Gift.findByIdAndUpdate(
-          item.giftId,
-          { $addToSet: { inCartUsers: userId } }
-        );
-      }
-    } catch (err) {
-      console.error('Cart save/update error:', err);
-    }
-  } else {
-    console.log('No cart to save or user not authenticated.');
-  }
-
-  req.session.cart = null; // Clear session cart
-};
-
-
 exports.getGiftsByCategory = async (category) => {
   return await Gift.find({ category });
 };
@@ -175,3 +56,41 @@ exports.getGiftsByRating = async (rating) => {
   return await Gift.find({ rating: { $gte: rating } });
 } 
 
+
+exports.postReviewIntoDB = async (req, res) => {
+  try {
+    const giftId = req.params.id;
+    const { rating, comment } = req.body;
+
+    const gift = await Gift.findById(giftId);
+    if (!gift) return res.status(404).send('Gift not found');
+
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).send('Not logged in');
+
+    // Check if user already reviewed
+    const existingReview = gift.reviews.find(
+      (rev) => rev.userId?.toString() === userId.toString()
+    );
+
+    if (existingReview) {
+      // Update review
+      existingReview.rating = rating;
+      existingReview.comment = comment;
+      existingReview.createdAt = new Date();
+    } else {
+      // Add new review
+      gift.reviews.push({
+        userId,
+        rating,
+        comment,
+      });
+    }
+
+    await gift.save();
+    res.redirect(`/gifts/${giftId}`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+};
