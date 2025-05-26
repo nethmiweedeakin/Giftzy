@@ -2,9 +2,35 @@
 const Chat = require('../models/chat');
 const Gift = require('../models/gift');
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
 
 function setupSocket(io, session) {
   io.use((socket, next) => {
+    // Pull token and sessionId from cookies
+    const cookieHeader = socket.request.headers.cookie || '';
+    const cookies = Object.fromEntries(cookieHeader.split('; ').map(c => c.split('=')));
+    
+    const token = cookies.token;
+    const sessionId = cookies.sessionId;
+
+    // Attach decoded user to socket.request if token is valid
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        socket.request.user = decoded;
+        socket.request.sessionId = null; // It's a logged-in user
+      } catch (err) {
+        console.error('Invalid JWT:', err.message);
+        socket.request.user = null;
+        socket.request.sessionId = sessionId || null;
+      }
+    } else {
+      // Guest user with session ID
+      socket.request.user = null;
+      socket.request.sessionId = sessionId || null;
+    }
+
     session(socket.request, {}, next);
   });
 
@@ -14,7 +40,7 @@ io.on('connection', (socket) => {
 
     const user = req.user || { _id: req.session.user, isGuest: true }
 
-   socket.on('joinRoom', ({ giftId }) => {
+   socket.on('joinRoom', ({ giftId }) => {  
   console.log(`📦 User joined room for gift ${giftId}`);
       const roomName = `gift_${giftId}`;
       socket.join(roomName);
@@ -25,13 +51,17 @@ io.on('connection', (socket) => {
   // Inside socket/chat.js
 socket.on('chatMessage', async ({ message, giftId }) => {
   const roomName = `gift_${giftId}`;
-  const user  = req.session.user || { _id: null, isGuest: true };
+const user = socket.request.user;
+const sessionId = socket.request.sessionId;
+
+  let isGuest = !user;
+  let userId = user._id || null;
 
   console.log('[chatMessage] User:', user);
   console.log('[chatMessage] Message:', message);
 
   const newMsg = new Chat({
-    sender: user._id,
+    sender: userId || sessionId,
     isGuest: user.isGuest,
     gift: giftId,
     message,
