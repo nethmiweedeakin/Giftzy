@@ -54,6 +54,10 @@ router.get('/addPost', authMiddleware, (req, res) => {
   res.render('addPostCommunity', { error: null, user: req.user });
 });
 
+router.get('/event-reminder', authMiddleware, (req, res) => {
+  res.render('eventReminder/index', { error: null, user: req.user });
+});
+
 router.get('/communityMainPage', authMiddleware, postController.getCommunityMainPage);
 
 router.get('/detailPostPage', authMiddleware, postController.getDetailPostPage);
