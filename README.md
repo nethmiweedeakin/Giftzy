@@ -157,3 +157,30 @@ flowchart TD
 _Diagram created by Tsz Hin Yee (223983938)_
 
 https://deakin365-my.sharepoint.com/:w:/g/personal/s223983938_deakin_edu_au/EQw_A4UQl99PktAWoutjvIkBtAvXk3CUKvHzwA9ePMLXiA?e=qI0UNy
+
+
+7. How to run the container
+- How to build the image:
+Type this into the terminal:
+```
+docker build -t express-docker-app .
+```
+
+- How to run the container:
+```
+docker-compose up --build
+```
+
+- which port to access: 
+The project:
+```
+http://localhost:3000
+```
+The /api/student :
+```
+http://localhost:3000/api/student
+```
+
+- What the /api/student output should look like;
+It should pretty-print:
+{"fullName":"My Chi Nguyen","studentID":"225255856"}
