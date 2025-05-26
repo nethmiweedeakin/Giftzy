@@ -160,7 +160,7 @@ https://deakin365-my.sharepoint.com/:w:/g/personal/s223983938_deakin_edu_au/EQw_
 
 
 7. How to run the container
-- How to build the image:
+- How to build the image:  
     Type this into the terminal:
 ```
 docker build -t express-docker-app .
@@ -171,7 +171,7 @@ docker build -t express-docker-app .
 docker-compose up --build
 ```
 
-- which port to access: 
+- which port to access:   
     The project:
 ```
 http://localhost:3000
@@ -181,6 +181,6 @@ The /api/student :
 http://localhost:3000/api/student
 ```
 
-- What the /api/student output should look like;
+- What the /api/student output should look like:  
     It should pretty-print:
 {"fullName":"My Chi Nguyen","studentID":"225255856"}
