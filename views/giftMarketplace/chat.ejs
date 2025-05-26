@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat about <%= gift.title %></title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      padding: 20px;
+    }
+    h2 {
+      color: #333;
+    }
+    #messages {
+      list-style: none;
+      padding: 0;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    #messages li {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+    .you {
+      background-color: #d1e7dd;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+    .other {
+      background-color: #f8d7da;
+      align-self: flex-start;
+    }
+    .meta {
+      font-size: 0.8em;
+      color: #555;
+      margin-bottom: 5px;
+    }
+    #chatContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    form {
+      display: flex;
+      gap: 5px;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>Chat about "<%= gift.name %>" </h2>
+  <h3>with seller "<%= gift.sellerName %>"</h3>
+  <ul id="messages"></ul>
+
+  <form id="chatForm">
+    <input id="msg" placeholder="Type your message..." autocomplete="off" />
+    <button>Send</button>
+  </form>
+
+  <script>
+    const socket = io();
+    const giftId = "<%= gift._id %>";
+    const currentUserId = "<%= user._id %>";
+
+    const messagesList = document.getElementById('messages');
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('msg');
+
+    // Join the room
+    socket.emit('joinRoom', { giftId });
+
+    // Load chat history
+    fetch(`/gift/chat/history/${giftId}`)
+      .then(res => res.json())
+      .then(messages => {
+        messages.forEach(msg => {
+          appendMessage({
+            senderName: msg.sender?.name || 'Guest',
+            senderRole: msg.isGuest ? 'Guest' : (msg.sender?._id === "<%= gift.sellerID.toString() %>" ? 'Seller' : 'Buyer'),
+            senderId: msg.sender?._id || null,
+            message: msg.message,
+            timestamp: msg.timestamp
+          });
+        });
+        scrollToBottom();
+      });
+
+    // Handle new message form submit
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const message = input.value.trim();
+      if (!message) return;
+      socket.emit('chatMessage', { message, giftId });
+      input.value = '';
+    });
+
+    // Append incoming message
+    socket.on('message', (data) => {
+      appendMessage(data);
+      scrollToBottom();
+    });
+
+    // Function to add a message to the UI
+    function appendMessage({ senderName, senderRole, senderId, message, timestamp }) {
+      const li = document.createElement('li');
+      const time = new Date(timestamp).toLocaleTimeString();
+
+      li.classList.add(senderId === currentUserId ? 'you' : 'other');
+      li.innerHTML = `
+        <div class="meta">${senderName} (${senderRole}) • ${time}</div>
+        <div>${message}</div>
+      `;
+      messagesList.appendChild(li);
+    }
+
+    function scrollToBottom() {
+      messagesList.scrollTop = messagesList.scrollHeight;
+    }
+  </script>
+</body>
+</html>

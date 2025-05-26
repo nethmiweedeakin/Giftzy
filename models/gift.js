@@ -24,4 +24,4 @@ const giftSchema = new mongoose.Schema({
 
 });
 
-module.exports = mongoose.model('Gift', giftSchema);
+module.exports = mongoose.models.Gift || mongoose.model('Gift', giftSchema);

@@ -7,8 +7,11 @@ const routes = require('./routes');
 const app = express();
 const port = 3000;
 const passport = require('./middlewares/passport');
+const { Server } = require('socket.io');
+const { setupSocket } = require('./socket/chat');
+const http = require('http');
+const socketio = require('socket.io');
 require('dotenv').config();
-
 
 app.use(express.json());
 
@@ -16,23 +19,28 @@ const cors = require('cors');
 app.use(cookieParser());
 const session = require('express-session');
 
-app.use(session({
-  secret:  process.env.SESSION_SECRET || "Secure_Secret_Key",
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET || "Secure_Secret_Key",
   resave: false,
   saveUninitialized: true,
   cookie: {
-    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    secure: false
   }
-}));
+});
 
+// Use it in Express
 
-app.use(
+app.use(sessionMiddleware,
   cors({
     origin: 'http://localhost:3000',
     credentials: true,
   }),
 );
 
+// Pass it to Socket.IO
+const server = http.createServer(app);
+const io = new Server(server);
 
 app.use(passport.initialize());
 
@@ -46,6 +54,8 @@ connectDB();
 
 app.use('/', routes);
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+// === Socket.IO Setup (in socket/chat.js) ===
+setupSocket(io, sessionMiddleware);
+server.listen(port, () => {
+  console.log(`🚀 Server running at http://localhost:${port}`);
 });

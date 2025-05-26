@@ -3,8 +3,11 @@ const express = require('express');
 const router = express.Router();
 const giftController = require('../controllers/giftController');
 const cartController = require('../controllers/cartController');
+const chatController = require('../controllers/chatController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const guestMiddleware = require('../middlewares/guestMiddleware');
+
+
 
 
 const Gift = require('../models/gift');
@@ -29,4 +32,10 @@ router.post('/cart/remove/:id', guestMiddleware, cartController.removeFromCart);
 
 // Clear the whole cart
 router.post('/cart/clear', guestMiddleware,  cartController.clearCart);
+
+
+// --- Chat Routes ---
+router.get('/chat/:giftId', guestMiddleware, chatController.chatRoom); // View chat UI
+router.get('/chat/:giftId/history', guestMiddleware, chatController.getChatHistory); 
+
 module.exports = router;
