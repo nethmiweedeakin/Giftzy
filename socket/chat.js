@@ -54,18 +54,19 @@ socket.on('chatMessage', async ({ message, giftId }) => {
 const user = socket.request.user;
 const sessionId = socket.request.sessionId;
 
-  let isGuest = !user;
-  let userId = user._id || null;
+let userId = user?.id || user?._id || null; // handle both cases
+let isGuest = !userId;
 
-  console.log('[chatMessage] User:', user);
+  console.log('[chatMessage] User:', sessionId);
   console.log('[chatMessage] Message:', message);
 
   const newMsg = new Chat({
-    sender: userId || sessionId,
-    isGuest: user.isGuest,
-    gift: giftId,
-    message,
-    timestamp: new Date()
+   sender: userId || undefined,
+  guestSessionId: isGuest ? sessionId : undefined,
+  isGuest,
+  gift: giftId,
+  message,
+  timestamp: new Date()
   });
 
   try {
@@ -76,16 +77,18 @@ const sessionId = socket.request.sessionId;
   }
 
   let senderName = 'Guest';
-  let senderRole = 'Guest';
+  let senderRole = 'Guest Buyer';
   let senderId = null;
 
-  if (user._id) {
-    const userData = await User.findById(user._id);
-    const gift = await Gift.findById(giftId);
-    senderName = userData?.name || 'User';
-    senderRole = gift?.sellerID?.toString() === user._id.toString() ? 'Seller' : 'Buyer';
-    senderId = user._id.toString();
-  }
+  const currentUserId = user?.id || user?._id;
+
+if (currentUserId) {
+  const userData = await User.findById(currentUserId);
+  const gift = await Gift.findById(giftId);
+  senderName = userData?.name || 'User' ;
+  senderRole = user?.buyer && gift?.sellerID==="senderName" ? 'Seller' : 'Buyer';
+  senderId = currentUserId.toString() || '0';
+}
 
   io.to(roomName).emit('message', {
     senderName,

@@ -5,7 +5,8 @@ const chatSchema = new mongoose.Schema({
   isGuest: { type: Boolean, default: false },
   gift: { type: mongoose.Schema.Types.ObjectId, ref: 'Gift' },
   message: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now }
+  timestamp: { type: Date, default: Date.now },
+  guestSessionId: { type: String },
 });
 
 module.exports = mongoose.models.Chat || mongoose.model('Chat', chatSchema);
