@@ -66,6 +66,32 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
+   .seller {
+  background-color: #d1e7dd; /* greenish */
+  align-self: flex-start;
+}
+
+.buyer {
+  background-color: #f8d7da; /* reddish */
+  align-self: flex-start;
+}
+.you {
+  background-color: #d7d9f8; /* blue */
+ align-self: flex-end;
+  text-align: right;
+  margin-left: auto;
+  margin-right: 10px;
+}
+.guest-buyer{
+    background-color: #e7dfd1; /* orange */
+  align-self: flex-start;
+}
+.guest{
+    background-color: #e7dfd1; /* orange */
+  align-self: flex-start;
+}
+
   </style>
 </head>
 <body>
@@ -81,7 +107,7 @@
   <script>
     const socket = io();
     const giftId = "<%= gift._id %>";
-    const currentUserId = "<%= user._id %>";
+    const currentUserId = "<%= user.id %>";
 
     const messagesList = document.getElementById('messages');
     const form = document.getElementById('chatForm');
@@ -91,7 +117,7 @@
     socket.emit('joinRoom', { giftId });
 
     // Load chat history
-    fetch(`/gift/chat/history/${giftId}`)
+    fetch(`/gifts/chat/${giftId}/history`)
       .then(res => res.json())
       .then(messages => {
         messages.forEach(msg => {
@@ -122,17 +148,28 @@
     });
 
     // Function to add a message to the UI
-    function appendMessage({ senderName, senderRole, senderId, message, timestamp }) {
-      const li = document.createElement('li');
-      const time = new Date(timestamp).toLocaleTimeString();
+   function appendMessage({ senderName, senderRole, senderId, message, timestamp }) {
+  const li = document.createElement('li');
+  const time = new Date(timestamp).toLocaleTimeString();
 
-      li.classList.add(senderId === currentUserId ? 'you' : 'other');
-      li.innerHTML = `
-        <div class="meta">${senderName} (${senderRole}) • ${time}</div>
-        <div>${message}</div>
-      `;
-      messagesList.appendChild(li);
-    }
+   // Log comparison
+  console.log('senderId:', senderId);
+  console.log('currentUserId:', currentUserId);
+  console.log('senderId === currentUserId:', senderId === currentUserId);
+
+ if (senderId === currentUserId) {
+    li.classList.add('you');
+  } else {
+    li.classList.add(senderRole.toLowerCase()); // 'seller', 'buyer', or 'guest'
+  }
+
+  li.innerHTML = `
+    <div class="meta">${senderName} (${senderRole}) • ${time}</div>
+    <div>${message}</div>
+  `;
+  messagesList.appendChild(li);
+}
+
 
     function scrollToBottom() {
       messagesList.scrollTop = messagesList.scrollHeight;

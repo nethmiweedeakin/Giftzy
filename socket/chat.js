@@ -77,7 +77,7 @@ let isGuest = !userId;
   }
 
   let senderName = 'Guest';
-  let senderRole = 'Guest Buyer';
+  let senderRole = 'Guest-Buyer';
   let senderId = null;
 
   const currentUserId = user?.id || user?._id;
