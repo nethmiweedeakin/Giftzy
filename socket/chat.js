@@ -86,9 +86,14 @@ if (currentUserId) {
   const userData = await User.findById(currentUserId);
   const gift = await Gift.findById(giftId);
   senderName = userData?.name || 'User' ;
-  senderRole = user?.buyer && gift?.sellerID==="senderName" ? 'Seller' : 'Buyer';
+  senderRole = user?.buyer && gift?.sellerID.toString() === currentUserId.toString() ? 'Seller' : 'Buyer';
   senderId = currentUserId.toString() || '0';
-}
+}  else if (sessionId) {
+    // Guest user, show Guest-xxxxx
+    const suffix = sessionId.slice(-5); // last 5 characters
+    senderName = `Guest-${suffix}`;
+    senderId = sessionId;
+  }
 
   io.to(roomName).emit('message', {
     senderName,
