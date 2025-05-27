@@ -95,7 +95,7 @@
   </style>
 </head>
 <body>
-  <h2>Chat about "<%= gift.name %>" </h2>
+  <h2>Chat about "<%= gift.name %>" for <%= quantity %> quantity</h2>
   <h3>with seller "<%= gift.sellerName %>"</h3>
   <ul id="messages"></ul>
 
@@ -103,12 +103,18 @@
     <input id="msg" placeholder="Type your message..." autocomplete="off" />
     <button>Send</button>
   </form>
+  <% if (user?.id && user.buyer) { %>
+  <form action="/gifts/chat/<%= gift._id %>/verified" method="POST">
+    <button type="submit" class="verify-btn">Verified proof of purchase</button>
+  </form>
+<% } %>
+
 
   <script>
     const socket = io();
     const giftId = "<%= gift._id %>";
     const currentUserId = "<%= user.id %>";
-
+    const sessionId = "<%= user._id %>"; 
     const messagesList = document.getElementById('messages');
     const form = document.getElementById('chatForm');
     const input = document.getElementById('msg');
@@ -117,20 +123,32 @@
     socket.emit('joinRoom', { giftId });
 
     // Load chat history
-    fetch(`/gifts/chat/${giftId}/history`)
-      .then(res => res.json())
-      .then(messages => {
-        messages.forEach(msg => {
-          appendMessage({
-            senderName: msg.sender?.name || 'Guest',
-            senderRole: msg.isGuest ? 'Guest' : (msg.sender?._id === "<%= gift.sellerID.toString() %>" ? 'Seller' : 'Buyer'),
-            senderId: msg.sender?._id || null,
-            message: msg.message,
-            timestamp: msg.timestamp
-          });
-        });
-        scrollToBottom();
+   fetch(`/gifts/chat/${giftId}/history`)
+  .then(res => res.json())
+  .then(messages => {
+    messages.forEach(msg => {
+      let senderName = 'Guest';
+      let senderRole = 'Guest-Buyer';
+
+      if (msg.isGuest && msg.guestSessionId) {
+        const suffix = msg.guestSessionId.slice(-5);
+        senderName = `Guest-${suffix}`;
+      } else if (msg.sender && msg.sender.name) {
+        senderName = msg.sender.name;
+        senderRole = (msg.sender._id === '<%= gift.sellerID.toString() %>') ? 'Seller' : 'Buyer';
+      }
+
+      appendMessage({
+        senderName,
+        senderRole,
+        senderId: msg.sender?._id || msg.guestSessionId || null,
+        message: msg.message,
+        timestamp: msg.timestamp,
       });
+    });
+
+    scrollToBottom();
+  });
 
     // Handle new message form submit
     form.addEventListener('submit', (e) => {

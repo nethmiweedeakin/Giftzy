@@ -75,7 +75,11 @@
         </button>
         </form>
                 
-          <a href="/gifts/chat/<%=  gift._id %>" class="chat-seller-btn">Chat with Seller</a>
+         <form action="/gifts/chat/<%= gift._id %>" method="POST" id="chatForm">
+  <input type="hidden" name="quantity" id="chatQuantity" value="1">
+  <button type="submit" class="chat-seller-btn">Chat with Seller</button>
+</form>
+
         </div>
 
         <a href="/gifts" class="back-link">← Back to list</a>
@@ -336,11 +340,17 @@ const availability = "<%= gift.availability %>";
   const form = document.getElementById('cartForm');
   const quantityInput = document.getElementById('quantity');
   const formQuantity = document.getElementById('formQuantity');
+  
+  const chatForm = document.getElementById('chatForm');
+  const chatQuantity = document.getElementById('chatQuantity');
 
  form.addEventListener('submit', () => {
     formQuantity.value = quantityInput.value;
   });
 
+  chatForm.addEventListener('submit', () => {
+    chatQuantity.value = quantityInput.value;
+  });
 
   //Increment and Decrement functionality
   document.getElementById('increment').addEventListener('click', () => {
