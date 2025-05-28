@@ -37,5 +37,5 @@ router.post('/cart/clear', guestMiddleware,  cartController.clearCart);
 // --- Chat Routes ---
 router.post('/chat/:giftId', guestMiddleware, chatController.chatRoom); // View chat UI
 router.get('/chat/:giftId/history', guestMiddleware, chatController.getChatHistory); 
-
+router.post('/chat/:giftId/verified', guestMiddleware, chatController.getSaleSuccess);
 module.exports = router;

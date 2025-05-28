@@ -20,6 +20,33 @@ exports.getChatHistory = async (req, res) => {
   const messages = await Chat.find({ gift: giftId })
     .populate('sender', 'name')
     .sort({ createdAt: 1 });
+  
 
   res.json(messages);
+};
+
+exports.getSaleSuccess = async (req, res) => {
+const { giftId } = req.params;
+  const { quantity } = req.body;
+
+  try {
+    const gift = await Gift.findById(giftId);
+    const qty = parseInt(quantity, 10);
+
+    if (!gift) {
+      return res.status(404).send('Gift not found');
+    }
+
+    // Subtract quantity, ensure availability doesn't go below 0
+    gift.availability = Math.max(0, gift.availability - qty);
+    await gift.save();
+
+    req.flash('success', `Purchase verified! Availability reduced by ${qty}.`);
+    res.redirect(`/gifts/${giftId}?chatStarted=true`);
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Something went wrong!');
+    res.redirect('back');
+  }
+
 };

@@ -66,7 +66,15 @@
             <input type="number" id="quantity" name="quantity" value="1" min="1" readonly>
             <button type="button" id="increment">+</button>
             </div>
-        <div class="gift-actions">
+        <div class="gift-actions">   
+      <!-- Chat Form -->  
+         <form action="/gifts/chat/<%= gift._id %>" method="POST" id="chatForm">
+  <input type="hidden" name="quantity" id="chatQuantity" value="1">
+  <button type="submit" class="chat-seller-btn" <% if (gift.availability <= 0) { %> disabled <% } %>> 
+    Chat with Seller
+  </button>
+</form>
+
          <!-- Add to Cart Form -->
     <form action="/gifts/cart/add/<%= gift._id %>" method="POST" id="cartForm">
         <input type="hidden" name="quantity" id="formQuantity" value="1">
@@ -74,11 +82,6 @@
             Add to Cart
         </button>
         </form>
-                
-         <form action="/gifts/chat/<%= gift._id %>" method="POST" id="chatForm">
-  <input type="hidden" name="quantity" id="chatQuantity" value="1">
-  <button type="submit" class="chat-seller-btn">Chat with Seller</button>
-</form>
 
         </div>
 
@@ -222,6 +225,7 @@
       cursor: pointer;
     }
 
+    .chat-seller-btn:disabled,
     .add-to-cart-btn:disabled {
       background-color: #777;
       cursor: not-allowed;
@@ -369,6 +373,20 @@ const availability = "<%= gift.availability %>";
       document.getElementById('quantityInput').value = input.value;
     }
   });
+
+  // Check if the URL has chatStarted=true
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('chatStarted') === 'true') {
+    const alertBox = document.createElement('div');
+    alertBox.innerHTML = `
+      <div style="padding: 15px; background-color: #e0ffe0; border: 1px solid #0c0; border-radius: 5px; margin-top: 15px;">
+        🎉 Purchased successfully!
+        <a href="/gifts/cart" style="color: blue; text-decoration: underline; margin-left: 10px;">Go to Cart</a>
+      </div>
+    `;
+    document.body.prepend(alertBox);
+  }
+
 </script>
 
 </html>

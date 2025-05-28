@@ -12,7 +12,7 @@ const { setupSocket } = require('./socket/chat');
 const http = require('http');
 const socketio = require('socket.io');
 require('dotenv').config();
-
+const flash = require('connect-flash');
 app.use(express.json());
 
 const cors = require('cors');
@@ -37,6 +37,16 @@ app.use(sessionMiddleware,
     credentials: true,
   }),
 );
+
+app.use(flash());
+// Makes messages available in all EJS views
+app.use((req, res, next) => {
+  res.locals.messages = {
+    success: req.flash('success'),
+    error: req.flash('error')
+  };
+  next();
+});
 
 // Pass it to Socket.IO
 const server = http.createServer(app);

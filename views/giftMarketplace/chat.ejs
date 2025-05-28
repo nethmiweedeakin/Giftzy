@@ -92,6 +92,21 @@
   align-self: flex-start;
 }
 
+.alert {
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  width: fit-content;
+}
+.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
   </style>
 </head>
 <body>
@@ -103,12 +118,12 @@
     <input id="msg" placeholder="Type your message..." autocomplete="off" />
     <button>Send</button>
   </form>
-  <% if (user?.id && user.buyer) { %>
-  <form action="/gifts/chat/<%= gift._id %>/verified" method="POST">
+<% if (user && user.id && user.buyer && (gift.sellerID === user.id) && (quantity > 0)) { %>
+  <form action="/gifts/chat/<%= gift._id %>/verified" method="POST" id="verifiedForm">
+    <input type="hidden" name="quantity" value="<%= quantity || 1 %>">
     <button type="submit" class="verify-btn">Verified proof of purchase</button>
   </form>
 <% } %>
-
 
   <script>
     const socket = io();
@@ -187,7 +202,6 @@
   `;
   messagesList.appendChild(li);
 }
-
 
     function scrollToBottom() {
       messagesList.scrollTop = messagesList.scrollHeight;

@@ -11,6 +11,7 @@
   <div class="page-container">
     <main class="gift-detail-container">
       <h1>Your Cart</h1>
+       <p>Navigate to gift and chat with seller for negotiations</p>
 
       <% if (cart && cart.length > 0) { %>
         <form action="/gifts/cart/clear" method="POST">
@@ -19,7 +20,7 @@
         <ul>
           <% cart.forEach(item => { %>
             <li>
-              <strong><%= item.name %></strong> - Quantity: <%= item.quantity %>
+              <strong><a href="/gifts/<%= item.id %>"><%= item.name %></a></strong> - Quantity: <%= item.quantity %>
               <form action="/gifts/cart/remove/<%= item.id %>" method="POST" style="display:inline;">
                 <button type="submit" class="btn danger small">Remove</button>
               </form>
