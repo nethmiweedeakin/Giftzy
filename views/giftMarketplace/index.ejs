@@ -16,6 +16,11 @@
   </div>
 <% } %>
 
+<h2> Search gifts</h2>
+<form method="GET" action="/gifts" class="search-form">
+  <input type="text" name="search" placeholder="Search gifts by name..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+  <button type="submit">Search</button>
+</form>
 
     <h1 class="gifts-title">Gifts</h1>
 
@@ -27,6 +32,8 @@
                     <h2 class="gift-name"><%= gift.name %></h2>
                     <p class="gift-description"><%= gift.description %></p>
                     <p class="gift-price">$<%= gift.price.toFixed(2) %></p>
+                    <p class="gift-seller">Sold by: <%= gift.sellerName || 'Unknown' %></p>
+                    <p class="gift-quantity">Available Quantity: <%= gift.availability %></p>
                     <a href="/gifts/<%= gift._id %>" class="gift-detail-btn">View Details</a>
                 </div>
             </div>
@@ -138,4 +145,28 @@ main {
         font-size: 18px;
         border-radius: 5px;
     }
+
+    .search-form {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.search-form input[type="text"] {
+  padding: 8px;
+  font-size: 16px;
+  width: 300px;
+  margin-right: 10px;
+}
+
+.search-form button {
+  padding: 8px 16px;
+  background-color: #559A6A;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+}
+
 </style>

@@ -6,14 +6,20 @@ const Cart = require('../models/cart');
 
 
 exports.listGifts = async (req, res) => {
-  const gifts = await giftService.getAllGifts();
+  let gifts = await giftService.getAllGifts();
+  const search = req.query.search || '';
+  const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+
+  if(search !== '') {
+ gifts = await Gift.find(query);
+  }
 
    let buyer = null;
   if (req.user?.id) {
     const dbUser = await User.findById(req.user.id).lean(); // lean for performance
     buyer = dbUser?.buyer || null;
   }
-  res.render('giftMarketplace/index', { gifts, user: req.user, buyer });
+  res.render('giftMarketplace/index', { gifts, user: req.user, buyer, search  });
 };
 
 exports.getGiftDetail = async (req, res) => {

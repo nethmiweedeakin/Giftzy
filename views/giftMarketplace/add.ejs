@@ -92,7 +92,8 @@
     </select>
 
     <input name="imageUrl" id="imageUrl" placeholder="Image URL (optional)" />
-
+  <input type="file" name="image" id="giftFile" accept="image/*">
+  <input type="hidden" name="imageBase64" id="imageBase64">
     <button type="submit">🎁 Add Gift</button>
   </form>
 </div>
@@ -101,16 +102,29 @@
   const form = document.getElementById('giftForm');
   const categorySelect = document.getElementById('categorySelect');
   const imageUrlInput = document.getElementById('imageUrl');
+ const imageUrlFile = document.getElementById('giftFile');
+const imageBase64Field = document.getElementById('imageBase64');
+const reader = new FileReader();
+
+  imageUrlFile.addEventListener('change', () => {
+    const file = imageUrlFile.files[0];
+    if (file) {
+      
+      reader.onload = () => {
+        imageBase64Field.value = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
   form.addEventListener('submit', function (e) {
     const category = categorySelect.value;
     const imageUrl = imageUrlInput.value.trim();
 
     // Set default placeholder image if not provided
-    if (!imageUrl && category) {
+    if (!imageUrl && !(imageUrlFile.files[0]) && category) {
       imageUrlInput.value = `https://placehold.co/300x200?text=${encodeURIComponent(category)}&font=roboto`;
-    }
-
-
+    }else if(!imageUrl && imageUrlFile) {
+      imageUrlInput.value = reader.result;  }
   });
 </script>

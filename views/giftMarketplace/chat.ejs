@@ -92,12 +92,6 @@
   align-self: flex-start;
 }
 
-.alert {
-  padding: 10px;
-  border-radius: 5px;
-  margin-top: 10px;
-  width: fit-content;
-}
 .success {
   background-color: #d4edda;
   color: #155724;
@@ -107,6 +101,26 @@
   color: #721c24;
 }
 
+#toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  padding: 15px 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  animation: slidein 0.3s ease;
+}
+
+@keyframes slidein {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
   </style>
 </head>
 <body>
@@ -116,8 +130,13 @@
 
   <form id="chatForm">
     <input id="msg" placeholder="Type your message..." autocomplete="off" />
+    <input id="img" type="file" accept="image/*" />
     <button>Send</button>
   </form>
+  
+<div id="toast" class="error" style="display: none;"></div>
+
+
 <% if (user && user.id && user.buyer && (gift.sellerID === user.id) && (quantity > 0)) { %>
   <form action="/gifts/chat/<%= gift._id %>/verified" method="POST" id="verifiedForm">
     <input type="hidden" name="quantity" value="<%= quantity || 1 %>">
@@ -158,6 +177,7 @@
         senderRole,
         senderId: msg.sender?._id || msg.guestSessionId || null,
         message: msg.message,
+        imageUrl: msg.imageUrl || null,
         timestamp: msg.timestamp,
       });
     });
@@ -166,13 +186,34 @@
   });
 
     // Handle new message form submit
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const message = input.value.trim();
-      if (!message) return;
-      socket.emit('chatMessage', { message, giftId });
-      input.value = '';
-    });
+  form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const message = input.value.trim();
+  const imageInput = document.getElementById('img');
+  const imageFile = imageInput.files[0];
+
+  if (!message && !imageFile) {
+    showToast('Please enter a message or select an image to send.');
+    return;
+  }
+
+  if (imageFile) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageUrl = reader.result; // base64 data URL
+      socket.emit('chatMessage', { message, imageUrl, giftId });
+    };
+    reader.readAsDataURL(imageFile);
+  } else {
+    socket.emit('chatMessage', { message, giftId });
+  }
+
+  // Clear inputs
+  input.value = '';
+  imageInput.value = '';
+});
+
 
     // Append incoming message
     socket.on('message', (data) => {
@@ -181,31 +222,43 @@
     });
 
     // Function to add a message to the UI
-   function appendMessage({ senderName, senderRole, senderId, message, timestamp }) {
+  function appendMessage({ senderName, senderRole, senderId, message, timestamp, imageUrl }) {
   const li = document.createElement('li');
   const time = new Date(timestamp).toLocaleTimeString();
 
-   // Log comparison
-  console.log('senderId:', senderId);
-  console.log('currentUserId:', currentUserId);
-  console.log('senderId === currentUserId:', senderId === currentUserId);
-
- if (senderId === currentUserId) {
+  if (senderId === currentUserId) {
     li.classList.add('you');
   } else {
-    li.classList.add(senderRole.toLowerCase()); // 'seller', 'buyer', or 'guest'
+    li.classList.add(senderRole.toLowerCase()); // seller, buyer, guest
   }
 
-  li.innerHTML = `
-    <div class="meta">${senderName} (${senderRole}) • ${time}</div>
-    <div>${message}</div>
-  `;
+  // Build message content
+  let contentHtml = `<div class="meta">${senderName} (${senderRole}) • ${time}</div>`;
+  if (message) {
+    contentHtml += `<div>${message}</div>`;
+  }
+  if (imageUrl) {
+    contentHtml += `<img src="${imageUrl}" style="max-width: 200px; margin-top: 5px; border-radius: 5px;" alt="sent image"/>`;
+  }
+
+  li.innerHTML = contentHtml;
   messagesList.appendChild(li);
 }
 
-    function scrollToBottom() {
+function scrollToBottom() {
       messagesList.scrollTop = messagesList.scrollHeight;
     }
+
+function showToast(message, duration = 3000) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.style.display = 'block';
+
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, duration);
+}
+
   </script>
 </body>
 </html>

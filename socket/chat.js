@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
     
     
   // Inside socket/chat.js
-socket.on('chatMessage', async ({ message, giftId }) => {
+socket.on('chatMessage', async ({ message, giftId, imageUrl }) => {
   const roomName = `gift_${giftId}`;
 const user = socket.request.user;
 const sessionId = socket.request.sessionId;
@@ -65,7 +65,8 @@ let isGuest = !userId;
   guestSessionId: isGuest ? sessionId : undefined,
   isGuest,
   gift: giftId,
-  message,
+  imageUrl: imageUrl || null,
+  message: message || null,
   timestamp: new Date()
   });
 
@@ -99,8 +100,9 @@ if (currentUserId) {
     senderName,
     senderId,
     senderRole,
-    message,
-    timestamp: newMsg.timestamp
+    message: message || null,
+    imageUrl: imageUrl || null,
+    timestamp: newMsg.timestamp,
   });
 });
 
