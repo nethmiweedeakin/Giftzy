@@ -94,3 +94,59 @@ exports.postReviewIntoDB = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+exports.getEditForm = async (req, res) => {
+  try {
+    const giftId = req.params.id;
+    const gift = await Gift.findById(giftId);
+    if (!gift) {
+      return res.status(404).send('Gift not found');
+    }
+    res.render('giftMarketplace/edit', { user: req.user, gift }); // pass gift data to pre-fill form
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+};
+exports.saveEdit = async (req, res) => {
+  try {
+    const giftId = req.params.id;
+    const {
+      name,
+      description,
+      price,
+      availability,
+      category,
+      imageUrl,
+      imageBase64,
+      rating
+    } = req.body;
+
+    const updateData = {
+      name,
+      description,
+      price,
+      availability,
+      category,
+      rating: Number(rating) || 0,
+    };
+
+    // Handle image update if a new image or URL was provided
+    if (imageBase64) {
+      updateData.image = imageBase64;
+    } else if (imageUrl) {
+      updateData.image = imageUrl;
+    }
+
+    const updatedGift = await Gift.findByIdAndUpdate(giftId, updateData, { new: true });
+
+    if (!updatedGift) {
+      return res.status(404).send('Gift not found');
+    }
+
+    res.redirect('/gifts'); // Or redirect to gift details page
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+};

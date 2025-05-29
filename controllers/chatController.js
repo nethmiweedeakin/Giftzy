@@ -42,6 +42,7 @@ const { giftId } = req.params;
     await gift.save();
 
     req.flash('success', `Purchase verified! Availability reduced by ${qty}.`);
+    
     res.redirect(`/gifts/${giftId}?chatStarted=true`);
   } catch (err) {
     console.error(err);

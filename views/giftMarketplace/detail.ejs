@@ -75,13 +75,21 @@
   </button>
 </form>
 
-         <!-- Add to Cart Form -->
-    <form action="/gifts/cart/add/<%= gift._id %>" method="POST" id="cartForm">
-        <input type="hidden" name="quantity" id="formQuantity" value="1">
-      <button type="submit" class="add-to-cart-btn" <% if (gift.availability <= 0) { %> disabled <% } %>>
-            Add to Cart
-        </button>
-        </form>
+
+  <!-- Show Edit if user is seller -->
+<% if (user && user.id && user.buyer && (gift.sellerID === user.id) ) { %>
+  <a href="/gifts/<%= gift._id %>/edit" class="add-to-cart-btn">Edit Gift</a>
+<% } %>
+
+  <!-- Add to Cart Form for others -->
+  <form action="/gifts/cart/add/<%= gift._id %>" method="POST" id="cartForm">
+    <input type="hidden" name="quantity" id="formQuantity" value="1">
+    <button type="submit" class="add-to-cart-btn" <% if (gift.availability <= 0) { %> disabled <% } %>>
+      Add to Cart
+    </button>
+  </form>
+
+
 
         </div>
 

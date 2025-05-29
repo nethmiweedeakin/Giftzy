@@ -53,3 +53,11 @@ exports.addGift = async (req, res) => {
 exports.postReview = async (req, res) => {
   await giftService.postReviewIntoDB(req, res);
 };
+
+exports.getEditForm = async (req, res) => {
+  await giftService.getEditForm(req, res);
+};
+
+exports.saveEdit = async (req, res) => {
+  await giftService.saveEdit(req, res);
+};

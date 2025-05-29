@@ -6,7 +6,8 @@ const cartController = require('../controllers/cartController');
 const chatController = require('../controllers/chatController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const guestMiddleware = require('../middlewares/guestMiddleware');
-
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() }); // or use diskStorage if needed
 
 
 
@@ -38,4 +39,9 @@ router.post('/cart/clear', guestMiddleware,  cartController.clearCart);
 router.post('/chat/:giftId', guestMiddleware, chatController.chatRoom); // View chat UI
 router.get('/chat/:giftId/history', guestMiddleware, chatController.getChatHistory); 
 router.post('/chat/:giftId/verified', guestMiddleware, chatController.getSaleSuccess);
+
+
+router.get('/:id/edit', guestMiddleware, giftController.getEditForm);
+router.post('/:id/edit', guestMiddleware, upload.single('image'), giftController.saveEdit);
+
 module.exports = router;
