@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const cookieParser = require('cookie-parser');
 const express = require('express');
+const bodyParser = require('body-parser');
 const path = require('path');
 const connectDB = require('./db');
 const routes = require('./routes');
@@ -14,6 +15,8 @@ const socketio = require('socket.io');
 require('dotenv').config();
 const flash = require('connect-flash');
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.json({ limit: '10mb' }));
 
 const cors = require('cors');
 app.use(cookieParser());

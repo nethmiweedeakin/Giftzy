@@ -1,4 +1,5 @@
-
+//Description: This route for the gift marketplace handles all routes related to gifts.
+// It includes routes for viewing gifts, adding gifts, editing gifts, deleting gifts, and managing the cart.
 const express = require('express');
 const router = express.Router();
 const giftController = require('../controllers/giftController');

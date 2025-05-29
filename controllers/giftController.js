@@ -1,3 +1,7 @@
+//Description: This controller handles all operations related to gifts in the gift marketplace.
+// It includes functions to list gifts, view gift details, add gifts, edit gifts, delete gifts, and manage reviews.
+// It interacts with the giftService to perform database operations and render views.
+
 const giftService = require('../services/giftService.js');
 const Gift = require('../models/gift');
 const User = require('../models/user');

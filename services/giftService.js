@@ -134,9 +134,14 @@ exports.saveEdit = async (req, res) => {
     // Handle image update if a new image or URL was provided
     if (imageBase64) {
       updateData.image = imageBase64;
+      console.log('Image Base64:', imageBase64?.slice(0, 30)); // log beginning of base64
     } else if (imageUrl) {
       updateData.image = imageUrl;
+      console.log('Image URL:', imageUrl);
     }
+    
+
+
 
     const updatedGift = await Gift.findByIdAndUpdate(giftId, updateData, { new: true });
 

@@ -35,15 +35,16 @@
 
 <script>
   const form = document.getElementById('giftForm');
-  const categorySelect = document.getElementById('categorySelect');
+ const categorySelect = document.getElementById('categorySelect');
   const imageUrlInput = document.getElementById('imageUrl');
-  const imageUrlFile = document.getElementById('giftFile');
-  const imageBase64Field = document.getElementById('imageBase64');
-  const reader = new FileReader();
+ const imageUrlFile = document.getElementById('giftFile');
+const imageBase64Field = document.getElementById('imageBase64');
+const reader = new FileReader();
 
   imageUrlFile.addEventListener('change', () => {
     const file = imageUrlFile.files[0];
     if (file) {
+      
       reader.onload = () => {
         imageBase64Field.value = reader.result;
       };
@@ -51,16 +52,29 @@
     }
   });
 
-  form.addEventListener('submit', function (e) {
-    const category = categorySelect.value;
-    const imageUrl = imageUrlInput.value.trim();
+ form.addEventListener('submit', function (e) {
+  e.preventDefault(); // Stop the form from submitting immediately
 
-    if (!imageUrl && !(imageUrlFile.files[0]) && category) {
+  const category = categorySelect.value;
+  const imageUrl = imageUrlInput.value.trim();
+  const file = imageUrlFile.files[0];
+
+  // When there's a file, convert to base64 and wait for reader
+  if (!imageUrl && file) {
+    reader.onload = () => {
+      imageBase64Field.value = reader.result;
+      form.submit(); // Submit only after reader finishes
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // If imageUrl is present or no file uploaded
+    if (!imageUrl && category) {
       imageUrlInput.value = `https://placehold.co/300x200?text=${encodeURIComponent(category)}&font=roboto`;
-    } else if (!imageUrl && imageUrlFile.files[0]) {
-      imageUrlInput.value = reader.result;
     }
-  });
+    form.submit();
+  }
+});
+
 </script>
 <style>
   .form-container {

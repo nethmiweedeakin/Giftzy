@@ -1,3 +1,8 @@
+//Description: This file defines the Gift model schema for a MongoDB database using Mongoose.
+//It handles chat messages in a gift marketplace application.
+// It includes fields for sender, message, gift reference, timestamp, and guest session ID.
+// It also includes an optional image URL field for sending images in chat messages.
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const chatSchema = new mongoose.Schema({

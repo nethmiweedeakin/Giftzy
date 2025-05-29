@@ -43,46 +43,76 @@ Giftzy is a web application built using **Node.js** that provides smart solution
 /api/posts/addpost
 - `POST` : Upload new Post
 
-## 🚀 Gift Marketplace APIs
+# 🚀 Gift Marketplace APIs
+
+Users can log in as **guest**, **seller**, or **buyer** and exchange gifts in this vibrant digital marketplace.
+
+---
+
+## 🎁 Gift Routes
 ## 🚀 Users can log in as guest, seller, or buyer and have exchange of goods in this market
-/gifts
-- `GET` : Get all gifts
 
-/gifts/:id
-- `GET` : Get gift by ID
+### `GET /gifts`
+- View all available gifts (accessible to guests and logged-in users)
 
-/gifts/:id/reviews
-- `GET` : Get gift with populated reviews
+### `GET /gifts/add`
+- Show the form to add a new gift (only for authenticated sellers)
 
-/gifts/add
-- `POST` : Add a new gift
+### `POST /gifts/add`
+- Add a new gift to the marketplace
 
-/gifts/:id
-- `PUT` : Update gift by ID
+### `GET /gifts/:id`
+- View a specific gift by its ID
 
-/gifts/:id
-- `DELETE` : Delete gift by ID
+### `GET /gifts/:id/edit`
+- Show the edit form for a gift (seller-only)
 
-/gifts/category/:category
-- `GET` : Get gifts by category
+### `POST /gifts/:id/edit`
+- Save changes to an existing gift
 
-/gifts/price
-- `GET` : Get gifts in price range (query: ?min=xx&max=xx)
+### `POST /gifts/:id/delete`
+- Delete a specific gift (seller-only)
 
-/gifts/available/:availability
-- `GET` : Get gifts with availability >= given value
+---
 
-/gifts/date
-- `GET` : Get gifts between created dates (query: ?start=yyyy-mm-dd&end=yyyy-mm-dd)
+## ⭐ Review Routes
 
-/gifts/search
-- `GET` : Search gifts by name (query: ?name=string)
+### `POST /gifts/:id/review`
+- Add a review for a gift (logged-in users only)
 
-/gifts/seller/:sellerID
-- `GET` : Get gifts by seller ID
+### `GET /gifts/:id/reviews`
+- Get gift details with populated reviews
 
-/gifts/rating/:rating
-- `GET` : Get gifts with rating >= given value
+---
+
+## 🛒 Cart Routes
+
+### `GET /gifts/cart`
+- View current user's cart
+
+### `POST /gifts/cart/add/:id`
+- Add a gift to the cart
+
+### `POST /gifts/cart/remove/:id`
+- Remove a specific item from the cart
+
+### `POST /gifts/cart/clear`
+- Clear the entire cart
+
+---
+
+## 💬 Chat Routes
+
+### `POST /gifts/chat/:giftId`
+- Initiate or view the chat room for a specific gift
+
+### `GET /gifts/chat/:giftId/history`
+- Fetch chat history for a specific gift
+
+### `POST /gifts/chat/:giftId/verified`
+- Mark chat as sale successful
+
+
 
 ## Example gift schema
 {
@@ -139,6 +169,7 @@ npm install
 ```
 MONGO_URI=
 JWT_SECRET=
+SESSION_SECRET=
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 ```
