@@ -113,34 +113,6 @@ Users can log in as **guest**, **seller**, or **buyer** and exchange gifts in th
 - Mark chat as sale successful
 
 
-
-## Example gift schema
-{
-  "_id": "66447990e64b8a92e2df673b",
-  "name": "Magic Puzzle",
-  "description": "A challenging 1000-piece puzzle.",
-  "price": 25.99,
-  "availability": 10,
-  "inCartUsers": [
-    "663eabc123def456ghi789jk",  
-    "663efff111aaa222bbb333cc"   
-  ],
-  "category": "Toys",
-  "sellerName": "Jane Doe",
-  "sellerEmail": "jane@example.com"
-  "reviews": [
-    {
-      "userId": {
-        "_id": "123",
-        "name": "Alice"
-      },
-      "rating": 4,
-      "comment": "Loved it!"
-    }
-  ]
-}
-
-
 ## 🚀 Getting Started
 
 ### Prerequisites
