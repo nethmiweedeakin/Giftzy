@@ -69,5 +69,9 @@ if (require.main === module) {
 }
 //QuizAdmin
 app.use('/quizAdmin', quizAdminRoutes);
+s
+app.get('/student-id', (req, res) => {
+  res.send('Student ID: 123456789');
+});
 
 
