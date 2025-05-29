@@ -14,9 +14,10 @@ This project is a Dockerised version of a Node.js-based gift marketplace applica
 
 ### 🔧 How to Build the Image
 
-In your terminal, navigate to the root of this project and run:
+In your terminal, navigate to the root of this project and run with ENV items:
 
 ```bash
-docker build -t gift-marketplace .
+docker build -t giftzy .
+docker run -p 3000:3000  -e GOOGLE_CLIENT_ID=""  -e GOOGLE_CLIENT_SECRET="" -e JWT_SECRET="" -e MONGO_URI=mongodb://localhost:27017/ -e JWT_SECRET="" giftzy
 
 

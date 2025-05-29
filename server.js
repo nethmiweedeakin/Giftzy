@@ -12,6 +12,7 @@ const secretAngelSocket = require("./sockets/secretAngelSocket");
 const likeNotificationSocket = require("./sockets/likeNotificationSocket");
 const eventReminderSocker = require("./sockets/eventReminderSocket");
 validateEnv();
+require('dotenv').config();
 
 //for Quiz Admin
 const quizAdminRoutes = require('./routes/quizAdminRoutes');
@@ -69,8 +70,8 @@ if (require.main === module) {
 }
 //QuizAdmin
 app.use('/quizAdmin', quizAdminRoutes);
-s
-app.get('/student-id', (req, res) => {
+
+app.get('/api/student', (req, res) => {
   res.send('Student ID: 224350062');
 });
 
