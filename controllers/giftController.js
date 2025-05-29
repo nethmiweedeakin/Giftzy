@@ -61,3 +61,23 @@ exports.getEditForm = async (req, res) => {
 exports.saveEdit = async (req, res) => {
   await giftService.saveEdit(req, res);
 };
+
+exports.deleteGift = async (req, res) => {
+  try {
+    const gift = await Gift.findById(req.params.id);
+
+    if (!gift) {
+      return res.status(404).send('Gift not found');
+    }
+
+    if (gift.sellerID.toString() !== req.user.id) {
+      return res.status(403).send('Unauthorized to delete this gift');
+    }
+
+    await Gift.findByIdAndDelete(req.params.id);
+    res.redirect('/gifts');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+};

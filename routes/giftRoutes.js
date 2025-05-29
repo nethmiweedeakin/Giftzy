@@ -43,5 +43,6 @@ router.post('/chat/:giftId/verified', guestMiddleware, chatController.getSaleSuc
 
 router.get('/:id/edit', guestMiddleware, giftController.getEditForm);
 router.post('/:id/edit', guestMiddleware, upload.single('image'), giftController.saveEdit);
+router.post('/:id/delete', guestMiddleware, giftController.deleteGift);
 
 module.exports = router;
