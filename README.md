@@ -15,6 +15,6 @@ In your terminal, navigate to the root of this project and run with ENV items:
 
 ```bash
 docker build -t giftzy .
-docker run -p 3000:3000  -e GOOGLE_CLIENT_ID=""  -e GOOGLE_CLIENT_SECRET="" -e JWT_SECRET="" -e MONGO_URI=mongodb://localhost:27017/ -e JWT_SECRET="" giftzy
+docker run -p 3000:3000  -e GOOGLE_CLIENT_ID=""  -e GOOGLE_CLIENT_SECRET="" -e JWT_SECRET="" -e MONGO_URI=mongodb://localhost:27017/ -e SESSION_SECRET="" giftzy
 
 
